@@ -1,0 +1,29 @@
+@font-face {
+    font-family: TheMatrix;
+    src: url('assets/matrix.ttf');
+}
+
+body {
+    margin: 0;
+    overflow: hidden;
+    background-color: black;
+}
+
+#background {
+    opacity: 0.6;
+}
+
+#content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+}
+
+h1 {
+    color: #cdf5cd;
+    font-family: TheMatrix;
+    text-shadow: black 2px 1px 32px;
+    text-align: center;
+}
