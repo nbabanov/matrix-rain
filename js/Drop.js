@@ -1,3 +1,7 @@
+'use strict';
+
+const Color = require('./Color');
+
 class Drop {
     constructor(canvas, context, charset, fillColor, font, fontSize, x, y, lifeSpan) {
         this.canvas = canvas;
@@ -7,23 +11,53 @@ class Drop {
         this.font = font;
         this.fontSize = fontSize;
         this.x = x;
+        this.y = y;
+        this.lifeSpan = lifeSpan;
+
+        this._isDead = false;
+        this.onDeathSubs = [];
 
 
+        this.startTime = null;
         this.now = null;
-        this.fps = 30;
+        this.fps = 10;
         this.then = null;
         this.elapsed = null;
-        this.fpsInterval = 1000 / fps;
+        this.fpsInterval = 1000 / this.fps;
 
-        this.resetTrail();
+        let fpsCount = (this.lifeSpan / 1000) * this.fps;
+
+        this.fadeAmount = new Color(
+            fillColor.r / fpsCount,
+            fillColor.g / fpsCount,
+            fillColor.b / fpsCount,
+            0
+        );
     }
 
-    resetTrail() {
-        this.y = Trail.calcStartPosition();
-        this.speed = Trail.calcSpeed(this.x, this.y, this.fontSize);
+    onDeath(callback) {
+        this.onDeathSubs.push(callback);
+    }
+
+    setIsDead(value) {
+        this._isDead = value;
+
+        if (value == true) {
+            for (let sub of this.onDeathSubs) {
+                sub();
+            }
+        }
+    }
+
+    getIsDead() {
+        return this._isDead;
     }
 
     animate() {
+        if (this.startTime == null) {
+            this.startTime = Date.now();
+        }
+
         if (this.then == null) {
             this.then = Date.now();
         }
@@ -40,27 +74,35 @@ class Drop {
             this.then = this.now - (this.elapsed % this.fpsInterval);
 
             // Put your drawing code here
-            this.draw();
+            if (!this.getIsDead()) {
+                this.draw();
+            }
+
         }
     }
 
     draw() {
+        //Clear last drop
+        this.context.fillStyle = 'black';
+        this.context.shadowBlur = 0;
+        this.context.shadowColor = 'black';
+        this.context.fillRect(this.x * this.fontSize - 10, this.y * this.fontSize - this.fontSize, this.fontSize + 10, this.fontSize + 2);
+
+        //Paint new one
         this.context.fillStyle = this.fillColor.toString();
         this.context.font = this.font;
-        this.context.shadowBlur = 10;
-        // this.context.shadowColor = 'green';
+        this.context.shadowColor = this.fillColor.toString();
 
         let text = this.charset[Math.floor(Math.random() * this.charset.length)];
-        //x = i*font_size, y = value of drops[i]*font_size
+
         this.context.fillText(text, this.x * this.fontSize, this.y * this.fontSize);
 
-        //sending the drop back to the top randomly after it has crossed the screen
-        //adding a randomness to the reset to make the drops scattered on the Y axis
-        if (this.y * this.fontSize > this.canvas.height && Math.random() > 0.975) {
-            this.resetTrail();
+        if (this.fillColor.r == 0 && this.fillColor.g == 0 && this.fillColor.b == 0) {
+            this.setIsDead(true);
         }
 
-        //incrementing Y coordinate
-        this.y++;
+        this.fillColor.subtract(this.fadeAmount);
     }
 }
+
+module.exports = Drop;

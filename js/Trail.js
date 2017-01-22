@@ -1,6 +1,8 @@
 'use strict';
 
 const Noise = require('./Noise');
+const Drop = require('./Drop');
+const Color = require('./Color');
 
 function getRandomArbitrary(min, max) {
     return Math.random() * (max - min) + min;
@@ -19,66 +21,111 @@ class Trail {
         this.x = x;
 
 
-        this.now = null;
         this.fps = 30;
+        this.now = null;
         this.then = null;
         this.elapsed = null;
+
+        this.fpsInterval = 1000 / this.fps;
+
+        this.nowDrop = null;
+        this.thenDrop = null;
+        this.elapsedDrop = null;
+
+
+        this.drops = [];
 
         this.resetTrail();
     }
 
     resetTrail() {
+        // this.drops = [];
         this.y = Trail.calcStartPosition();
         this.speed = Trail.calcSpeed(this.x, this.y, this.fontSize);
+
+        this.drops.push(new Drop(
+            this.canvas,
+            this.context,
+            this.charset,
+            new Color(this.fillColor.r, this.fillColor.g, this.fillColor.b),
+            this.font,
+            this.fontSize,
+            this.x,
+            this.y,
+            10000)
+        )
     }
 
-    getFPSInterval() {
-        return (1000 / this.fps) / this.speed;
+    getDropFPSInterval() {
+        return (this.fpsInterval) / this.speed;
     }
 
     static calcStartPosition() {
-        return getRandomArbitrary(1, -500);
+        return getRandomArbitrary(0, -10);
     }
 
     static calcSpeed(x, y, fontSize) {
-        // return getRandomArbitrary(0.1, 2);
-        return Math.abs(Noise.perlin3(x, y, fontSize) * 2) + 0.1;
-    }
-
-    static calcColor(x, y) {
-        return Math.floor(Math.abs(Noise.perlin2(x, y) * 150));
+        return Math.abs(Noise.perlin3(x, y, fontSize) * 2) + 0.2;
     }
 
     animate() {
-        if (this.then == null) {
+        if (this.then == null && this.thenDrop == null) {
             this.then = Date.now();
+            this.thenDrop = Date.now();
         }
 
         this.now = Date.now();
         this.elapsed = this.now - this.then;
 
-        // if enough time has elapsed, draw the next frame
+        this.nowDrop = Date.now();
+        this.elapsedDrop = this.nowDrop - this.thenDrop;
 
-        if (this.elapsed > this.getFPSInterval()) {
+        // if enough time has elapsed, draw the next frame
+        if (this.elapsed > this.fpsInterval) {
 
             // Get ready for next frame by setting then=now, but also adjust for your
             // specified fpsInterval not being a multiple of RAF's interval (16.7ms)
-            this.then = this.now - (this.elapsed % this.getFPSInterval());
+            this.then = this.now - (this.elapsed % this.fpsInterval);
 
             // Put your drawing code here
             this.draw();
         }
+
+        if (this.elapsedDrop > this.getDropFPSInterval()) {
+
+            // Get ready for next frame by setting then=now, but also adjust for your
+            // specified fpsInterval not being a multiple of RAF's interval (16.7ms)
+            this.thenDrop = this.nowDrop - (this.elapsedDrop % this.getDropFPSInterval());
+
+            // Put your drawing code here
+            this.moveTrail();
+        }
     }
 
     draw() {
+        for (let drop of this.drops) {
+            drop.animate();
+        }
+    }
+
+    moveTrail() {
         this.context.fillStyle = this.fillColor.toString();
         this.context.font = this.font;
-        this.context.shadowBlur = 10;
-        // this.context.shadowColor = 'green';
 
-        let text = this.charset[Math.floor(Math.random() * this.charset.length)];
-        //x = i*font_size, y = value of drops[i]*font_size
-        this.context.fillText(text, this.x * this.fontSize, this.y * this.fontSize);
+        let newDropIndex = this.drops.push(new Drop(
+                this.canvas,
+                this.context,
+                this.charset,
+                new Color(this.fillColor.r, this.fillColor.g, this.fillColor.b),
+                this.font,
+                this.fontSize,
+                this.x,
+                this.y,
+                1000)
+            ) - 1;
+        this.drops[newDropIndex].onDeath(() => {
+            this.drops.shift();
+        });
 
         //sending the drop back to the top randomly after it has crossed the screen
         //adding a randomness to the reset to make the drops scattered on the Y axis

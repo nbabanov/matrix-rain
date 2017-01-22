@@ -22,11 +22,12 @@ class Background {
 
         this.columns = this.canvas.width / this.fontSize; //number of columns for the rain
         //an array of drops - one per column
-        this.drops = [];
+        this.trails = [];
         //x below is the x coordinate
         //1 = y co-ordinate of the drop(same for every drop initially)
+        // this.columns = 1;
         for (let i = 0; i < this.columns; i++) {
-            this.drops[i] = new Trail(this.canvas, this.ctx, this.charset, new Color(0, 255, 0), `bold ${this.fontSize}px TheMatrix`, this.fontSize, i);
+            this.trails[i] = new Trail(this.canvas, this.ctx, this.charset, new Color(0, 255, 0), `bold ${this.fontSize}px TheMatrix`, this.fontSize, i);
         }
 
         //drawing the characters
@@ -41,6 +42,11 @@ class Background {
         this.fpsInterval = 1000 / this.fps;
         this.then = Date.now();
 
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0)';
+        this.ctx.shadowBlur = 0;
+        this.ctx.shadowColor = 'black';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
 
         this.animate();
     }
@@ -54,7 +60,7 @@ class Background {
             this.columns = columns
         } else {
             for (let i = this.columns; i < columns; i++) {
-                this.drops[i] = new Trail(this.canvas, this.ctx, this.charset, new Color(0, 255, 0), `bold ${this.fontSize}px TheMatrix`, this.fontSize, i);
+                this.trails[i] = new Trail(this.canvas, this.ctx, this.charset, new Color(0, 255, 0), `bold ${this.fontSize}px TheMatrix`, this.fontSize, i);
             }
             this.columns = columns;
         }
@@ -88,16 +94,9 @@ class Background {
     }
 
     draw() {
-        //Black BG for the canvas
-        //translucent BG to show trail
-        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-        this.ctx.shadowBlur = 0;
-        this.ctx.shadowColor = 'black';
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-        //looping over drops
-        for (let drop of this.drops) {
-            drop.animate();
+        //looping over trails
+        for (let trail of this.trails) {
+            trail.animate();
         }
 
     }
