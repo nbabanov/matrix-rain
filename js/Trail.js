@@ -24,6 +24,16 @@ Noise.seed(Math.random());
  * A trail represents a line of drops
  */
 class Trail {
+    /**
+     * Default constructor
+     * @param {Canvas} canvas
+     * @param {any} context
+     * @param {string} charset
+     * @param {Color} fillColor
+     * @param {string} font
+     * @param {number} fontSize
+     * @param {number} x - horizontal position of the trail
+     */
     constructor(canvas, context, charset, fillColor, font, fontSize, x) {
         this.canvas = canvas;
         this.context = context;
