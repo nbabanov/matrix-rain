@@ -4,3 +4,8 @@
 1. JavaScript
 1. Electron
 1. Canvas
+
+
+## Deployment
+
+1. Execute `npm start`
