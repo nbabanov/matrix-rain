@@ -1,6 +1,12 @@
 'use strict';
 
 class Color {
+    /**
+     * @param {number} r - red
+     * @param {number} g - green
+     * @param {number} b - blue
+     * @param {number} a - alpha
+     */
     constructor(r, g, b, a) {
         this.r = r;
         this.g = g;
@@ -8,10 +14,18 @@ class Color {
         this.a = typeof a != 'undefined' ? a : 1;
     }
 
+    /**
+     * Retuns string in rgba format
+     * @returns {string}
+     */
     toString() {
         return `rgba(${this.r},${this.g},${this.b},${this.a})`;
     }
 
+    /**
+     * Sums two colors
+     * @param {Color} color
+     */
     add(color) {
         this.r += color.r;
         this.g += color.g;
@@ -43,6 +57,10 @@ class Color {
         }
     }
 
+    /**
+     * Subtracts two colors
+     * @param {Color} color
+     */
     subtract(color) {
         this.r -= color.r;
         this.g -= color.g;
