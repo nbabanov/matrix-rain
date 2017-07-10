@@ -20,7 +20,7 @@ class Drop {
 
         this.startTime = null;
         this.now = null;
-        this.fps = 10;
+        this.fps = 6;
         this.then = null;
         this.elapsed = null;
         this.fpsInterval = 1000 / this.fps;
