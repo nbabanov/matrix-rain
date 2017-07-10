@@ -1,15 +1,28 @@
 'use strict';
 
+// TODO: Remove magic numbers
+
 const Noise = require('./Noise');
 const Drop = require('./Drop');
 const Color = require('./Color');
 
+/**
+ * Retruns a random number in a given range.
+ *
+ * @param {number} min
+ * @param {number} max
+ * @returns {number}
+ */
 function getRandomArbitrary(min, max) {
     return Math.random() * (max - min) + min;
 }
 
+// Initialization of the noise
 Noise.seed(Math.random());
 
+/**
+ * A trail represents a line of drops
+ */
 class Trail {
     constructor(canvas, context, charset, fillColor, font, fontSize, x) {
         this.canvas = canvas;
@@ -38,8 +51,11 @@ class Trail {
         this.resetTrail();
     }
 
+    /**
+     * Resets the trail position,
+     * so that it starts falling from the top again
+     */
     resetTrail() {
-        // this.drops = [];
         this.y = Trail.calcStartPosition();
         this.speed = Trail.calcSpeed(this.x, this.y, this.fontSize);
 
@@ -56,18 +72,36 @@ class Trail {
         )
     }
 
+    /**
+     * Retruns the FPS interval of a single drop
+     * @returns {number}
+     */
     getDropFPSInterval() {
         return (this.fpsInterval) / this.speed;
     }
 
+    /**
+     * Calculates a starting position.
+     * @returns {number}
+     */
     static calcStartPosition() {
         return getRandomArbitrary(0, -10);
     }
 
+    /**
+     * Calculates speed with perlin noise.
+     * @param {number} x
+     * @param {number} y
+     * @param {number} fontSize
+     * @returns {number}
+     */
     static calcSpeed(x, y, fontSize) {
         return Math.abs(Noise.perlin3(x, y, fontSize) * 2) + 0.2;
     }
 
+    /**
+     * Animates the trail
+     */
     animate() {
         if (this.then == null && this.thenDrop == null) {
             this.then = Date.now();
@@ -102,12 +136,18 @@ class Trail {
         }
     }
 
+    /**
+     * Animates all of the drops
+     */
     draw() {
         for (let drop of this.drops) {
             drop.animate();
         }
     }
 
+    /**
+     * Moves the trail down
+     */
     moveTrail() {
         this.context.fillStyle = this.fillColor.toString();
         this.context.font = this.font;

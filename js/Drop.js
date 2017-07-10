@@ -2,6 +2,9 @@
 
 const Color = require('./Color');
 
+/**
+ * Represents a single drop of the matrix rain (one changing symbol)
+ */
 class Drop {
     constructor(canvas, context, charset, fillColor, font, fontSize, x, y, lifeSpan) {
         this.canvas = canvas;
@@ -35,10 +38,18 @@ class Drop {
         );
     }
 
+    /**
+     * Subscriber for the on death event
+     * @param callback
+     */
     onDeath(callback) {
         this.onDeathSubs.push(callback);
     }
 
+    /**
+     * Setter for the deadness
+     * @param value
+     */
     setIsDead(value) {
         this._isDead = value;
 
@@ -49,10 +60,17 @@ class Drop {
         }
     }
 
+    /**
+     * Checks if the drop is dead
+     * @returns {boolean|*}
+     */
     getIsDead() {
         return this._isDead;
     }
 
+    /**
+     * Animates the drop
+     */
     animate() {
         if (this.startTime == null) {
             this.startTime = Date.now();
@@ -81,6 +99,9 @@ class Drop {
         }
     }
 
+    /**
+     * Draws symbol on the screen
+     */
     draw() {
         //Clear last drop
         this.context.fillStyle = 'black';

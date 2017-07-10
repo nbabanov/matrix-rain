@@ -4,6 +4,10 @@ const Trail = require('./Trail');
 const Color = require('./Color');
 
 class Background {
+    /**
+     * Default constructor
+     * @param {number} fontSize
+     */
     constructor(fontSize) {
         this.canvas = document.getElementById('background');
         this.ctx = this.canvas.getContext("2d");
@@ -14,7 +18,7 @@ class Background {
 
 
         let charset = 'ABG67HIlmopJK)[{nL$%^MN34OZabQcCDxyEF]de89f<ghijkqrstuPRSTUVWXYvwz0125!#&*(}>\|`~\'"';
-        // let chinese = "田由甲申甴电甶男甸甹町画甼甽甾甿畀畁畂畃畄畅畆畇畈畉畊畋界畍畎畏畐畑";
+
         //converting the string into an array of single characters
         this.charset = charset.split('');
         this.fontSize = fontSize;
@@ -31,7 +35,6 @@ class Background {
         }
 
         //drawing the characters
-
         window.addEventListener('resize', this.recalculateDimentions.bind(this));
 
         this.now = null;
@@ -51,6 +54,9 @@ class Background {
         this.animate();
     }
 
+    /**
+     * On resize recalculates the BG dimensions
+     */
     recalculateDimentions() {
         this.canvas.height = window.innerHeight;
         this.canvas.width = window.innerWidth;
@@ -66,11 +72,13 @@ class Background {
         }
     }
 
+    /**
+     * Animates the falling characters
+     */
     animate() {
         requestAnimationFrame(this.animate.bind(this));
 
         // calc elapsed time since last loop
-
         if (this.then == null) {
             this.then = Date.now();
         }
@@ -79,7 +87,6 @@ class Background {
         this.elapsed = this.now - this.then;
 
         // if enough time has elapsed, draw the next frame
-
         if (this.elapsed > this.fpsInterval) {
 
             // Get ready for next frame by setting then=now, but also adjust for your
@@ -93,6 +100,9 @@ class Background {
 
     }
 
+    /**
+     * Animates every single rain trail
+     */
     draw() {
         //looping over trails
         for (let trail of this.trails) {
